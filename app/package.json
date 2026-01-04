@@ -1,0 +1,32 @@
+{
+  "name": "home-assistant-webhook-converter",
+  "version": "1.0.0",
+  "description": "Convert GET requests to POST for Home Assistant webhooks - Enables NFC tags, browsers, and GET-only services to trigger Home Assistant automations",
+  "main": "server.js",
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "webhook",
+    "converter",
+    "get-to-post",
+    "nfc",
+    "automation",
+    "synology",
+    "docker",
+    "nodejs",
+    "express",
+    "webhook-proxy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR-USERNAME/home-assistant-webhook-converter.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "axios": "^1.7.9"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
