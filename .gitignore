@@ -29,3 +29,7 @@ Thumbs.db
 *.cert
 secrets/
 
+# Private deployment scripts (keep local only)
+scripts/publish.sh
+scripts/test-local.sh
+
