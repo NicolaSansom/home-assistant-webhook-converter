@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   webhook-converter:
-    image: node:24-alpine
+    image: nicolasansom/home-assistant-webhook-converter:1.0.0
     container_name: webhook-converter
     restart: unless-stopped
     ports:
@@ -11,7 +11,4 @@ services:
       - PORT=3000
       - NODE_ENV=production
     volumes:
-      - ./app:/usr/src/app
       - ./logs:/usr/src/app/logs
-    working_dir: /usr/src/app
-    command: sh -c "npm install && node server.js"
