@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+
+# Build outputs
+dist/
+build/
+
+# Docker
+Dockerfile
+
+# Screenshots
+screenshots/

@@ -26,6 +26,13 @@
     "express": "^4.21.2",
     "axios": "^1.7.9"
   },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,json,html,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,json,html,md,yml,yaml}\""
+  },
   "engines": {
     "node": ">=20.0.0"
   }
