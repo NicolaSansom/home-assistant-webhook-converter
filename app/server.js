@@ -103,7 +103,7 @@ app.get('/convert', async (req, res) => {
     }
 
     // Extract all params except 'target' and 'name'
-    const { target, name, ...postData } = req.query;
+    const { target: _target, name: _name, ...postData } = req.query;
 
     log(`🔄 GET → POST Conversion`);
     log(`   From: ${req.ip}`);
