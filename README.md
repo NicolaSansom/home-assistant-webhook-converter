@@ -2,13 +2,16 @@
 
 **Convert GET requests to POST for Home Assistant webhooks** - A lightweight Node.js server that enables NFC tags, browsers, and GET-only services to trigger Home Assistant automations. Perfect for Synology NAS Docker deployments.
 
+![Link Generator Form](screenshots/generate-link.jpg)
+
 **Features:**
 
-- Converts GET requests to POST for Home Assistant webhooks
-- Works with NFC tags, browsers, and GET-only services
-- Lightweight Node.js server
-- Docker-ready for Synology Container Manager
-- Simple setup, no configuration needed
+- 🔗 **Link Generator Form** - Easy-to-use web interface to generate GET-friendly URLs
+- 🔄 Converts GET requests to POST for Home Assistant webhooks
+- 📱 Works with NFC tags, browsers, and GET-only services
+- 🐳 Docker-ready for Synology Container Manager
+- ⚡ Lightweight Node.js server
+- 🎯 Simple setup, no configuration needed
 
 ## 🤔 Why This Exists
 
@@ -38,52 +41,79 @@ Browser/NFC Tag → GET → Webhook Converter (Node.js) → POST → Home Assist
 
 ## 🚀 Setup Guide
 
-### Method 1: Pull from GitHub (Recommended)
+### Container Manager (Recommended - Easiest)
 
-**Step 1: Download from GitHub**
+This is the easiest way to get started using Synology's Container Manager to pull the pre-built Docker image.
 
-1. Open **File Station** on your Synology
-2. Navigate to `/docker/` (create if doesn't exist)
-3. **Option A - Direct Download:**
-
-   - Download this repo as ZIP from GitHub
-   - Extract to `/docker/webhook-converter/`
-
-4. **Option B - Git Clone (if you have Git installed):**
-   ```bash
-   cd /volume1/docker
-   git clone https://github.com/YOUR-USERNAME/home-assistant-webhook-converter.git webhook-converter
-   ```
-
-### Step 2: Create Project in Container Manager
+#### Step 1: Open Container Manager
 
 1. Open **DSM** → **Container Manager**
 
-![Open Container Manager](screenshots/open-container-manager.png)
+![Open Container Manager](screenshots/open-container-manager.jpg)
 
-2. Click the **Project** tab at the top
+#### Step 2: Go to Registry Tab
 
-3. Click **Create** button
+1. Click the **Registry** tab at the top
 
-![Create Project Button](screenshots/create-project-button.png)
+![Registry Tab](screenshots/registry-tab.jpg)
 
-4. Fill in the form:
-   - **Project Name:** `webhook-converter`
-   - **Path:** Click browse → select `/docker/webhook-converter`
-   - **Source:** Select **"Use an existing docker-compose.yml"**
+#### Step 3: Search for the Image
 
-![Create Project Menu](screenshots/create-project-menu.png)
+1. In the search box, type: `nicolasansom`
+2. Press Enter or click the search icon
 
-5. Click **Done**
+![Search Image](screenshots/search-image.jpg)
 
-6. Wait for the container to build and start (~30 seconds)
+#### Step 4: Download the Image
 
-### Step 3: Verify It's Running
+1. Find `nicolasansom/home-assistant-webhook-converter` in the results
+2. Click on it to select it
+3. Click the **Download** button
+4. Select the **latest** tag (or specific version)
+5. Click **OK** and wait for the download to complete
+
+![Download Image](screenshots/download-image.jpg)
+
+#### Step 5: Click into the Image and Run
+
+1. In the Registry tab, find `nicolasansom/home-assistant-webhook-converter` in your downloaded images
+2. Click on the image to open it
+3. Click the **Run** button
+4. A side form will open for configuration
+
+![Run Image](screenshots/run-image.jpg)
+
+#### Step 6: Configure Container
+
+1. In the side form that opens:
+   - **Container Name:** `webhook-converter`
+   - **Enable auto-restart:** ✓ (recommended)
+2. Click **Next** or continue to port settings
+
+![Configure Container](screenshots/configure-container.jpg)
+
+#### Step 7: Configure Port
+
+1. In the side form, click **Port Settings** or navigate to the port configuration
+2. Add port mapping:
+   - **Container Port:** `3000`
+   - **Local Port:** `3001` (or your preferred port)
+3. Click **Next** or continue
+
+![Port Settings](screenshots/port-settings.jpg)
+
+#### Step 8: Review and Create
+
+1. Review your settings in the side form
+2. Click **Done**
+3. Wait for the container to start
+
+![Review Settings](screenshots/review-settings.jpg)
+
+#### Step 9: Verify It's Running
 
 1. In Container Manager, go to **Container** tab
-2. Look for `webhook-converter` with status **Running** 🟢
-
-![Project Running](screenshots/project-running.png)
+2. Look for `-home-assistant-webhook-converter` with status **Running** 🟢
 
 3. Open your browser and go to:
 
@@ -91,9 +121,9 @@ Browser/NFC Tag → GET → Webhook Converter (Node.js) → POST → Home Assist
 http://YOUR_NAS_IP:3001/health
 ```
 
-Replace `YOUR_NAS_IP` with your Synology's IP address (e.g., `192.168.1.100`)
+Replace `YOUR_NAS_IP` with your Synology's IP address (e.g., `192.132.8.200`)
 
-4. You should see:
+4. You should see something similar to this:
 
 ```json
 {
@@ -105,81 +135,36 @@ Replace `YOUR_NAS_IP` with your Synology's IP address (e.g., `192.168.1.100`)
 
 ✅ **Success!** Your converter is running.
 
+
 ## 🔗 How to Use
 
-### Step 1: Create Home Assistant Webhook
-
-1. Open Home Assistant
-2. Go to **Settings** → **Automations & Scenes**
-3. Click **Create Automation** → **Create new automation**
-4. Click **Add Trigger** → Select **Webhook**
-
-5. Home Assistant generates a webhook URL like:
+1. Open your browser and navigate to:
 
 ```
-http://YOUR_NAS_IP:8123/api/webhook/WEBHOOK_ID
+http://YOUR_NAS_IP:3001/generate
 ```
 
-6. Copy this entire URL ← You'll need it!
-
-### Step 2: Build Your Converter URL
-
-Take your Home Assistant webhook URL and format it like this:
+Or simply visit the root URL:
 
 ```
-http://YOUR_NAS_IP:3001/convert?target=YOUR_WEBHOOK_URL
+http://YOUR_NAS_IP:3001/
 ```
 
-**Real Example:**
+2. Paste your Home Assistant webhook URL in the form
+3. Click **Generate Link**
+4. Copy the generated URL
+5. Use this URL in NFC tags or bookmarks!
 
-```
-http://YOUR_NAS_IP:3001/convert?target=http://YOUR_NAS_IP:8123/api/webhook/WEBHOOK_ID
-```
+When you trigger the webhook, you'll see a success page:
 
-This is your final URL to use with NFC tags!
-
-### Step 3: Write URL to NFC Tag
-
-Use your converter URL to write to NFC tags. This enables any phone to scan the tag and trigger your Home Assistant automation without needing a special app.
+![Success Page](screenshots/success-example.jpg)
 
 ## 🔒 Security Considerations
 
-**Important Security Notes:**
+This service is designed for use within a secure network environment, typically behind your home network's firewall and router. It has no built-in authentication, which is intentional for ease of use in trusted local network scenarios.
 
-- ⚠️ **No Authentication**: This service has no authentication by design - it's meant for local network use only
-- 🔐 **Webhook IDs are Secret**: Your Home Assistant webhook IDs are sensitive - don't share them publicly
-- 🏠 **Local Network Only**: This service should only be accessible on your local network (192.168.x.x)
-- 🚫 **Don't Expose to Internet**: Never expose port 3001 to the internet without additional security (firewall, VPN, etc.)
+**Best Practices:**
 
-## 🔧 Management
-
-### View Logs
-
-**Container Manager:**
-
-1. Go to **Container** tab
-2. Select `webhook-converter`
-3. Click **Details** → **Log** tab
-
-**File Station:**
-
-- Navigate to `/docker/webhook-converter/logs/app.log`
-
----
-
-### Restart Container
-
-**Container Manager:**
-
-- Select `webhook-converter` → **Action** → **Restart**
-
----
-
-### Update Node.js Version
-
-1. **Project** tab → Select `webhook-converter`
-2. **Action** → **Edit**
-3. Change image: `node:24-alpine` to `node:26-alpine`
-4. Click **Build**
-
----
+- 🏠 **Local Network Use**: Designed to run on your local network (192.168.x.x)
+- 🔐 **Webhook IDs**: Keep your Home Assistant webhook IDs private
+- 🛡️ **Network Security**: Your router's firewall typically provides the necessary protection for local services
