@@ -32,12 +32,69 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Helper function to check if request is from a browser
+const isBrowserRequest = (req) => {
+  const userAgent = req.get('User-Agent') || '';
+  return (
+    userAgent.includes('Mozilla') ||
+    userAgent.includes('Chrome') ||
+    userAgent.includes('Safari') ||
+    userAgent.includes('Firefox') ||
+    userAgent.includes('Edge')
+  );
+};
+
+// Helper function to extract automation name from query params or URL
+const getAutomationName = (req, targetUrl) => {
+  // Check for 'name' query parameter first
+  if (req.query.name) {
+    return req.query.name;
+  }
+
+  // Try to extract from target URL (e.g., webhook name in path)
+  if (targetUrl) {
+    const webhookMatch = targetUrl.match(/webhook\/([^/?]+)/i);
+    if (webhookMatch) {
+      return webhookMatch[1].replace(/-/g, ' ').replace(/_/g, ' ');
+    }
+  }
+
+  return null;
+};
+
+// Helper function to render success HTML page
+const renderSuccessPage = (automationName) => {
+  const displayName = automationName || 'Automation';
+  const htmlPath = path.join(__dirname, 'views', 'success.html');
+  let html = fs.readFileSync(htmlPath, 'utf8');
+  html = html.replace(/\{\{AUTOMATION_NAME\}\}/g, displayName);
+  return html;
+};
+
+// Helper function to render error HTML page
+const renderErrorPage = (errorMessage) => {
+  const htmlPath = path.join(__dirname, 'views', 'error.html');
+  let html = fs.readFileSync(htmlPath, 'utf8');
+  html = html.replace(/\{\{ERROR_MESSAGE\}\}/g, errorMessage);
+  return html;
+};
+
 // Main GET to POST conversion - NO AUTH REQUIRED
 app.get('/convert', async (req, res) => {
   try {
     const targetUrl = req.query.target;
+    const isBrowser = isBrowserRequest(req);
 
     if (!targetUrl) {
+      if (isBrowser) {
+        return res
+          .status(400)
+          .send(
+            renderErrorPage(
+              'Missing target parameter. Please provide a target URL.'
+            )
+          );
+      }
       return res.status(400).json({
         error: 'Missing target parameter',
         example:
@@ -45,8 +102,8 @@ app.get('/convert', async (req, res) => {
       });
     }
 
-    // Extract all params except 'target'
-    const { target, ...postData } = req.query;
+    // Extract all params except 'target' and 'name'
+    const { target, name, ...postData } = req.query;
 
     log(`🔄 GET → POST Conversion`);
     log(`   From: ${req.ip}`);
@@ -65,6 +122,13 @@ app.get('/convert', async (req, res) => {
 
     log(`✅ Success: ${response.status}`);
 
+    // If browser request, return HTML page
+    if (isBrowser) {
+      const automationName = getAutomationName(req, targetUrl);
+      return res.send(renderSuccessPage(automationName));
+    }
+
+    // Otherwise return JSON
     res.json({
       success: true,
       status: response.status,
@@ -73,6 +137,16 @@ app.get('/convert', async (req, res) => {
     });
   } catch (error) {
     log(`❌ Error: ${error.message}`);
+    const isBrowser = isBrowserRequest(req);
+
+    if (isBrowser) {
+      const errorMessage = error.response
+        ? `Home Assistant error: ${error.message}`
+        : `Request failed: ${error.message}`;
+      return res
+        .status(error.response?.status || 500)
+        .send(renderErrorPage(errorMessage));
+    }
 
     if (error.response) {
       return res.status(error.response.status).json({
