@@ -32,6 +32,17 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Serve the link generator form
+app.get('/generate', (req, res) => {
+  const htmlPath = path.join(__dirname, 'views', 'generate.html');
+  res.sendFile(htmlPath);
+});
+
+// Root path redirects to generator for friendly URL
+app.get('/', (req, res) => {
+  res.redirect('/generate');
+});
+
 // Helper function to check if request is from a browser
 const isBrowserRequest = (req) => {
   const userAgent = req.get('User-Agent') || '';
