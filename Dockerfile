@@ -33,5 +33,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Run as non-root user
 USER node
 
+# Override any entrypoint from base image
+ENTRYPOINT []
+
 # Start application
 CMD ["node", "server.js"]

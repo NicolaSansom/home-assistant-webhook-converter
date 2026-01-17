@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   webhook-converter:
-    image: nicolasansom/home-assistant-webhook-converter:1.0.0
+    image: nicolasansom/home-assistant-webhook-converter:latest
     container_name: webhook-converter
     restart: unless-stopped
     ports:
